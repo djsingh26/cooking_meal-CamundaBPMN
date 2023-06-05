@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0w27cbu" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.10.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.2.0">
+  <bpmn:collaboration id="Collaboration_0bcgq4a">
+    <bpmn:participant id="Participant_1tzzusc" name="Find and Cook Meal" processRef="Process_0rhu5lm" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_0rhu5lm" isExecutable="true">
+    <bpmn:extensionElements>
+      <zeebe:userTaskForm id="userTaskForm_3letdrl">{
+  "components": [
+    {
+      "label": "Recipe",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1u7v0s8",
+        "columns": null
+      },
+      "id": "Field_10jd638",
+      "key": "recipe_content"
+    },
+    {
+      "action": "submit",
+      "label": "Finished",
+      "type": "button",
+      "layout": {
+        "row": "Row_1ws3z5v",
+        "columns": null
+      },
+      "id": "Field_0y4g8sg",
+      "key": "field_0360jiw"
+    }
+  ],
+  "type": "default",
+  "id": "Form_0bjcbu8",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.2.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.10.0"
+  },
+  "schemaVersion": 8
+}</zeebe:userTaskForm>
+      <zeebe:userTaskForm id="userTaskForm_0r0o4t0">{
+  "components": [
+    {
+      "label": "Text field",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0z2flvl",
+        "columns": null
+      },
+      "id": "Field_05t2xin",
+      "key": "recipe_title"
+    },
+    {
+      "label": "Do you want to cook this?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1lnbrg0",
+        "columns": null
+      },
+      "id": "Field_1vmeq7c",
+      "key": "decision"
+    }
+  ],
+  "type": "default",
+  "id": "Form_1iihzmc",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.2.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.10.0"
+  },
+  "schemaVersion": 8
+}</zeebe:userTaskForm>
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="StartEvent_1" name="Hunger occured">
+      <bpmn:outgoing>Flow_19kutx7</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0fv2c44" name="Choose recipe from cooking website">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="recipe-worker" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19kutx7</bpmn:incoming>
+      <bpmn:incoming>Flow_052ztuz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xn2vxu</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_0q7g4ql" name="Cook meal?">
+      <bpmn:incoming>Flow_1e629hd</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xdc30d</bpmn:outgoing>
+      <bpmn:outgoing>Flow_052ztuz</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Event_0thw0aa" name="Meal cooked">
+      <bpmn:incoming>Flow_1r90t44</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Activity_15iizng" name="Decide on recipe">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=true" target="decision" />
+        </zeebe:ioMapping>
+        <zeebe:formDefinition formKey="camunda-forms:bpmn:userTaskForm_0r0o4t0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1xn2vxu</bpmn:incoming>
+      <bpmn:outgoing>Flow_1e629hd</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Activity_088gr2f" name="Display and cook meal">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formKey="camunda-forms:bpmn:userTaskForm_3letdrl" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0xdc30d</bpmn:incoming>
+      <bpmn:outgoing>Flow_1r90t44</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_19kutx7" sourceRef="StartEvent_1" targetRef="Activity_0fv2c44" />
+    <bpmn:sequenceFlow id="Flow_052ztuz" name="no" sourceRef="Gateway_0q7g4ql" targetRef="Activity_0fv2c44">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=decision = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1xn2vxu" sourceRef="Activity_0fv2c44" targetRef="Activity_15iizng" />
+    <bpmn:sequenceFlow id="Flow_1e629hd" sourceRef="Activity_15iizng" targetRef="Gateway_0q7g4ql" />
+    <bpmn:sequenceFlow id="Flow_0xdc30d" name="yes" sourceRef="Gateway_0q7g4ql" targetRef="Activity_088gr2f">
+      <bpmn:extensionElements />
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=decision = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1r90t44" sourceRef="Activity_088gr2f" targetRef="Event_0thw0aa" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0bcgq4a">
+      <bpmndi:BPMNShape id="Participant_1tzzusc_di" bpmnElement="Participant_1tzzusc" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="980" height="290" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="232" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="211" y="205" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02cgnkf_di" bpmnElement="Activity_0fv2c44">
+        <dc:Bounds x="320" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0q7g4ql_di" bpmnElement="Gateway_0q7g4ql" isMarkerVisible="true">
+        <dc:Bounds x="645" y="155" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="640" y="131" width="59" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0thw0aa_di" bpmnElement="Event_0thw0aa">
+        <dc:Bounds x="932" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="919" y="205" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0oqf1p0_di" bpmnElement="Activity_15iizng">
+        <dc:Bounds x="480" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14zgauk_di" bpmnElement="Activity_088gr2f">
+        <dc:Bounds x="760" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_19kutx7_di" bpmnElement="Flow_19kutx7">
+        <di:waypoint x="268" y="180" />
+        <di:waypoint x="320" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_052ztuz_di" bpmnElement="Flow_052ztuz">
+        <di:waypoint x="670" y="205" />
+        <di:waypoint x="670" y="340" />
+        <di:waypoint x="370" y="340" />
+        <di:waypoint x="370" y="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="514" y="322" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xn2vxu_di" bpmnElement="Flow_1xn2vxu">
+        <di:waypoint x="420" y="180" />
+        <di:waypoint x="480" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1e629hd_di" bpmnElement="Flow_1e629hd">
+        <di:waypoint x="580" y="180" />
+        <di:waypoint x="645" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xdc30d_di" bpmnElement="Flow_0xdc30d">
+        <di:waypoint x="695" y="180" />
+        <di:waypoint x="760" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="719" y="162" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1r90t44_di" bpmnElement="Flow_1r90t44">
+        <di:waypoint x="860" y="180" />
+        <di:waypoint x="932" y="180" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
